@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>home page</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="/css/style.css" rel="stylesheet">
+    </head>
+    <body>
+    <nav>
+    <%- include('nav_template') -%>
+    </nav>
+    <h1>Home Page</h1>
+    <%- include('list_template',context=[{course_code:'s381f',course_name:'Server-side Technologies And Cloud Computing'}]) -%>
+    </body>
+</html>

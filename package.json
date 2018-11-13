@@ -1,0 +1,20 @@
+{
+  "name": "miniproject.s381f.course",
+  "version": "1.0.0",
+  "description": "project initialization",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "mongodb": "^2.2.31",
+    "assert": "*",
+    "express": "*",
+    "ejs": "*",
+    "formidable": "1.2.1"
+  },
+  "author": "Raven Chan",
+  "license": "ISC",
+  "devDependencies": {}
+}
