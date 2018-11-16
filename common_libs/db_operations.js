@@ -59,7 +59,7 @@ const db_operations = {
     insertDB: function (dataObject, collection = defaultCollection) {
         this.connectDB(function (db) {
             try {
-                db.collection(collection).insertOne(dataObject, this.callback_result(err, results))
+                db.collection(collection).insertOne(dataObject, function(err,results){this.callback_result(err, results)})
             } catch (err) {
                 console.log(err)
             }
@@ -75,9 +75,9 @@ const db_operations = {
         this.connectDB(function (db) {
             try {
                 if (many) {
-                    db.collection(collection).deleteMany(conditions, this.callback_result(err, results))
+                    db.collection(collection).deleteMany(conditions, function(err,results){this.callback_result(err, results)})
                 } else {
-                    db.collection(collection).deleteOne(conditions, this.callback_result(err, results))
+                    db.collection(collection).deleteOne(conditions, function(err,results){this.callback_result(err, results)})
                 }
             } catch (err) {
                 console.log(err)
@@ -94,9 +94,9 @@ const db_operations = {
         this.connectDB(function (db) {
             try {
                 if (many) {
-                    db.collection(collections).updateMany(conditions, this.callback_result(err, results))
+                    db.collection(collections).updateMany(conditions, function(err,results){this.callback_result(err, results)})
                 } else {
-                    db.collection(collections).updateOne(conditions, this.callback_result(err, results))
+                    db.collection(collections).updateOne(conditions, function(err,results){this.callback_result(err, results)})
                 }
             } catch (err) {
                 console.log(err)
