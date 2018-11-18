@@ -6,31 +6,38 @@ const defaultCollection = 'restaurants'
 const db_operations = {
     /**
      * connet to mongodb
-     * @param {function} callback Optional, pass in a callback function for subsequent database operations, default value will be empty string
+     * @param {function(MongoClient)} callback Optional, pass in a callback function for subsequent database operations, default value will be empty string
+     * @throws mongodb errors
      */
     connectDB: function (callback = '') {
         MongoClient.connect(mongoURL, function (err, db) {
-            assert.equal(err, null)
-            console.log('conneted to mongodb')
-            if (typeof callback === 'function') {
-                callback(db)
+            try {
+                assert.equal(err, null)
+                console.log('conneted to mongodb')
+                if (typeof callback === 'function') {
+                    callback(db)
+                }
+                db.close()
+                console.log('disconneted to mongodb')
+            } catch (err) {
+                console.log(err)
+                throw new Error('Connot connect to database!')
             }
-            db.close()
-            console.log('disconneted to mongodb')
         })
     },
     /**
      * Find specified records in mongodb
      * @param {object} keyValuePair Compulsary, key-value pairs to be searched, can be one pair or many
-     * @param {function} callback Compulsary, callback function for subsequent operations
+     * @param {function(array)} callback Compulsary, callback function for subsequent operations
      * @param {object} projection Optional, projection of the result set
      * @param {number} limit Optional, set the limit for the results.Set to nagetive number if it is unlimited
      * @param {string} collection Optional, set the collection name
+     * @throws mongodb exception
      */
     findDB: function (keyValuePair, callback, projection = {}, limit, collection = defaultCollection) {
         this.connectDB(function (db) {
             var cursor
-            var resultSet = {}
+            var resultSet = []
             if (limit) {
                 cursor = db.collection(collection).find(keyValuePair, projection).limit(limit)
             } else {
@@ -48,72 +55,85 @@ const db_operations = {
                 })
             } catch (err) {
                 console.log(err)
+                throw new Error('Enquiry error! Try again')
             }
         })
     },
     /**
      * Insert data into mongodb
      * @param {object} dataObject Compulsory, the object to be inserted
+     * @param {function(string,object)} callback Compulsory, callback function for subsequent operations
      * @param {string} collection Optional, set the collection name
+     * @throws mongodb errors
      */
     insertDB: function (dataObject, collection = defaultCollection) {
         this.connectDB(function (db) {
             try {
-                db.collection(collection).insertOne(dataObject, function(err,results){this.callback_result(err, results)})
+                db.collection(collection).insertOne(dataObject, function (err, results) {
+                    if (err) throw err
+                    callback(results)
+                })
             } catch (err) {
                 console.log(err)
+                throw new Error('Insertion error! Try again')
             }
         })
     },
     /**
      * Delete records in mongodb
      * @param {object} conditions Compulsary, specify the conditions for data deletion
+     * @param {function(object)} callback Compulsary, callback function for subsequent operations
      * @param {boolean} many Optional, delete more than one record or not
      * @param {string} collection Optional, set the collection name
+     * @throws mongodb errors
      */
-    deleteDB: function (conditions, many, collection = defaultCollection) {
+    deleteDB: function (conditions, callback, many, collection = defaultCollection) {
         this.connectDB(function (db) {
             try {
                 if (many) {
-                    db.collection(collection).deleteMany(conditions, function(err,results){this.callback_result(err, results)})
+                    db.collection(collection).deleteMany(conditions, function (err, results) {
+                        if (err) throw err
+                        callback(results)
+                    })
                 } else {
-                    db.collection(collection).deleteOne(conditions, function(err,results){this.callback_result(err, results)})
+                    db.collection(collection).deleteOne(conditions, function (err, results) {
+                        if (err) throw err
+                        callback(results)
+                    })
                 }
             } catch (err) {
                 console.log(err)
+                throw new Error('Deletion error! Nothing changed Try again')
             }
         })
     },
     /**
      * Update records in mongodb
      * @param {object} conditions Compulsary, specify the conditions for data update
+     * @param {function(object)} callback Compulsary, callback function for subsequent operations
      * @param {boolean} many Optional, update more than one record or not
      * @param {string} collection Optional, set the collection name
+     * @throws mongodb errors
      */
-    updateDB: function (conditions, many, collection = defaultCollection) {
+    updateDB: function (conditions, callback, many, collection = defaultCollection) {
         this.connectDB(function (db) {
             try {
                 if (many) {
-                    db.collection(collections).updateMany(conditions, function(err,results){this.callback_result(err, results)})
+                    db.collection(collection).updateMany(conditions, function (err, results) {
+                        if (err) throw err
+                        callback(results)
+                    })
                 } else {
-                    db.collection(collections).updateOne(conditions, function(err,results){this.callback_result(err, results)})
+                    db.collection(collection).updateOne(conditions, function (err, results) {
+                        if (err) throw err
+                        callback(results)
+                    })
                 }
             } catch (err) {
                 console.log(err)
+                throw new Error('Update error! Try again')
             }
         })
-    },
-    /**
-     * callback function for displaying results of data operations
-     * @param {string} err error message
-     * @param {string} results results after operations
-     */
-    callback_result: function (err, results) {
-        if (err) {
-            throw err
-        } else {
-            console.log(results)
-        }
     }
 }
 
