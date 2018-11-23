@@ -16,9 +16,7 @@ app.use(session({
     keys: ['secret keys']
 }))
 // set routes
-app.get('/', function (req, res) {
-    HomepageHandle.homepage(req, res)
-})
+app.get('/', HomepageHandle.homepage)
 
 app.get('/error', function (req, res) {
     res.status(global.redirectionError.status)
@@ -28,4 +26,4 @@ app.get('/error', function (req, res) {
 app.get(/(^create)*/, function (req, res) {
     res.redirect('/error')
 })
-app.listen(process.env.PORT || 8099)
+app.listen(process.env.PORT || 3000)
