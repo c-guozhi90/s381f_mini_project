@@ -3,6 +3,7 @@ const app = Express()
 const session = require('cookie-session')
 const HomepageHandle = require('./page_handles/sample_homepage')
 const UserHandle = require('./page_handles/account_control')
+const restaurantHandle=require('./page_handles/restaurant_control')
 
 global.redirectionError = {
     status: 404,
@@ -25,6 +26,8 @@ app.get('/account/check', UserHandle.check)
 app.route('/account/login').all(UserHandle.login)
 app.get('account/logout'.UserHandle.logout)
 app.get('/account/home/:page', UserHandle.home)
+
+app.rounte('/restaurant/create').get(restaurantHandle.form).post(restaurantHandle.create)
 
 app.get('/error', function (req, res) {
     res.status(global.redirectionError.status)
