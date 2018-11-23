@@ -66,7 +66,7 @@ const db_operations = {
      * @param {string} collection Optional, set the collection name
      * @throws mongodb errors
      */
-    insertDB: function (dataObject, collection = defaultCollection) {
+    insertDB: function (dataObject, callback, collection = defaultCollection) {
         this.connectDB(function (db) {
             try {
                 db.collection(collection).insertOne(dataObject, function (err, results) {
