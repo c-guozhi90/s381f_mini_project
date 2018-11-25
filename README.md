@@ -20,6 +20,11 @@ mongodb|version 2.2.31. Caution, version greater than that was specified in pack
 # Rules of naming
 Use lower case for naming files. There should be an underscore between each meaningful word
 
+# ES6
+A test before showed that the IBM cloud supports ES6, hence the codes in [common_libs](/common_libs) have been rewritten with new style.  
+Using *ES6 standard* has lots of benefits, such as increased writability and enhenced erro handling. The callback function in nodejs brings great performance in responsive speed, however it also brings troubles in error handling. Programmer cannot deal with error occurs in callback function using try...catch... block as usual. Once it throws an error within a callback, the whole program will **crash**! Eventough in ES6 this problem still exist. **Be careful**!  
+To solve this problem, ES6 brings us a new feature called *promise*. With the promise mechanism, errors inside a callback can be properly handled in a delicated way. Always remenber, **never** throw an error within a callback.  
+
 # Setup
 ```
 # install
