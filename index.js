@@ -13,7 +13,7 @@ global.redirectionError = {
 app.set('view engine', 'ejs')
 app.use('/css', Express.static('css'))
 app.use(session({
-    user_id:'',
+    user_id: '',
     user_name: '',
     keys: ['secret keys']
 }))
@@ -21,7 +21,9 @@ app.use(session({
 app.get('/', HomepageHandle.homepage)
 
 app.route('/account/create').get(UserHandle.form).post(UserHandle.create)
-app.get('/account/check',UserHandle.check)
+app.get('/account/check', UserHandle.check)
+app.get('/account/login', UserHandle.login)
+app.get('/account/home/:page', UserHandle.home)
 
 app.get('/error', function (req, res) {
     res.status(global.redirectionError.status)

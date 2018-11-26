@@ -1,0 +1,6 @@
+<%for(i=1;i<=pages.length;i++){%>
+    <%if(i==curPage)%>
+        <b><%= i%></b>
+    <%else%>
+        <a href="<%= pages[i]['link']%>"><%= i%></a>
+<%}%>

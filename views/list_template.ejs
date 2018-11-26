@@ -1,7 +1,7 @@
 <% for(idx in context){%>
     <ul>
     <% for(prop in context[idx]){%>
-        <li><%= prop%>: <%= context[idx][prop]%></li>
+        <li><%- context[idx][prop]%></li>
     <%}%>
     </ul>
 <%}%>

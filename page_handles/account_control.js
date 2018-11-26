@@ -25,13 +25,13 @@ const User = {
                     .then(resultSet => {
                         if (resultSet.length)
                             throw new Error('The user id has already benn taken, try another one.')
-                        DBOperations.insertDB(user,'users').then(result => {
+                        DBOperations.insertDB(user, 'users').then(result => {
                             console.log(`User inserted ${result['insertedCount']} document(s)`)
                             req.session.user_id = user['userid']
                             res.status(200).render('success_message_template.ejs',
                                 context = {
                                     title: 'Account creation successful',
-                                    message: 'You have automatically logged in, click <a href="/account/home">here</a> to your main page'
+                                    message: 'You have automatically logged in, click <a href="/account/home/1">here</a> to your main page'
                                 })
                         }).catch(err => { throw err })
                     })
@@ -68,13 +68,13 @@ const User = {
                     return
                 }
                 DBOperations.findDB({ userid: userid, password: password }, {}, 1, 'users')
-                    .then(ressultSet => {
+                    .then(resultSet => {
                         if (resultSet.length) {
                             req.session.userid = userid
                             res.status(200).render('success_message_template',
                                 context = {
                                     title: 'login successfully',
-                                    message: 'You have successfully logged in, click <a href="/account/home">here</a> to see your restaurants'
+                                    message: 'You have successfully logged in, click <a href="/account/home/1">here</a> to see your restaurants'
                                 })
                         }
                         else throw new Error('No such user exists!')
@@ -84,6 +84,30 @@ const User = {
                     })
             }
         })
+    },
+    home: function (req, res) {
+        if (!req.session.user_id) {
+            console.log('redirecting')
+            res.status(300).redirect('/account/login')
+            return
+        }
+        var page = req.params.page
+        if (page == 1) {
+            DBOperations.findDB({ owner: req.session['user_name'] }, { restaurant_id: 1, name: 1 }, 1000) //maximum enquiry count will be 1000
+                .then(resultSet => {
+                    req.session.ownRestaurants = resultSet
+                    res.status(200).render('homepage_template', contents(req.session.ownRestaurants, page))
+                })
+                .catch(err => {
+                    wrongMessage(500, res, err)
+                })
+        } else {
+            if (!page || !req.session.ownRestaurants) {
+                res.status(300).redirect('account/home/1')
+                return
+            }
+            res.status(200).render('homepage_template', contents(req.session.ownRestaurants, page))
+        }
     }
 }
 module.exports = User
@@ -94,4 +118,19 @@ function wrongMessage(status, res, err) {
     if (status === 500) global.redirectionError.title = 'Operation failed!'
     else if (status === 404) global.redirectionError.title = '404 not found!'
     res.redirect('/error')
+}
+function contents(resultSet, page) {
+    var context = []
+    var pages = []
+    if (resultSet.length) {
+        for (i = 0; i < 20 && 20 * (page - 1) + i < resultSet.length; i++) {
+            context[i].push({ restautant: `<a href="/restaurant/${resultSet['restaurant_id']}">${resultSet[20 * page + i]['name']}</a>` })
+        }
+        for (i = 1; i <= Math.floor(resultSet / 20) + 1; i++) {
+            pages[i].push({ link: `/account/home/${i}` })
+        }
+    }
+    var title = 'user home'
+    var content = { context: context, pages: pages, title: title, curPage: page }
+    return content
 }
