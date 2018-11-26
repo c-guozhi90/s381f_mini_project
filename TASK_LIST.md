@@ -6,7 +6,8 @@ create restaurant|function_create_restaurant|in progress|Raven|23 Nov, 2018
 update restaurant|function_update_restaurant|initialized|Raven|16 Nov, 2018
 create account|function_create_account|finished|Raven|24 Nov, 2018
 refactor codes|master|finished|Raven|25 Nov, 2018
-login account|function_login_account|initialized|Raven|26 Nov, 2018
+login account|function_login_account|finished|Raven|26 Nov, 2018
+user homepage|function_account_home|in progress|Raven|26 Nov, 2018
 
 > ### Note
 > Fill functions' name or summary of works you have done into the task column  
