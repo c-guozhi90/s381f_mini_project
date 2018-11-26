@@ -25,8 +25,9 @@ const User = {
                     .then(resultSet => {
                         if (resultSet.length)
                             throw new Error('The user id has already benn taken, try another one.')
-                        DBOperations.insertDB(user).then(result => {
-                            console.log(`Uer inserted ${result['insertedCount']} document(s)`)
+                        DBOperations.insertDB(user,'users').then(result => {
+                            console.log(`User inserted ${result['insertedCount']} document(s)`)
+                            req.session.user_id = user['userid']
                             res.status(200).render('success_message_template.ejs',
                                 context = {
                                     title: 'Account creation successful',
