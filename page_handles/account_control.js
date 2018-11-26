@@ -27,7 +27,11 @@ const User = {
                             throw new Error('The user id has already benn taken, try another one.')
                         DBOperations.insertDB(user).then(result => {
                             console.log(`Uer inserted ${result['insertedCount']} document(s)`)
-                            res.status(200).send('success')
+                            res.status(200).render('success_message_template.ejs',
+                                context = {
+                                    title: 'Account creation successful',
+                                    message: 'You have automatically logged in, click <a href="/account/home">here</a> to your main page'
+                                })
                         }).catch(err => { throw err })
                     })
                     .catch(err => {
@@ -51,6 +55,34 @@ const User = {
             .catch(err => {
                 wrongMessage(500, res, err)
             })
+    },
+    login: function (req, res) {
+        form = new formidable.IncomingForm()
+        form.parse(req, (err, fields, files) => {
+            if (!err) {
+                var userid = fields.userid
+                var password = fields.password
+                if (!userid || !password) {
+                    wrongMessage(404, res, new Error('Empty user id or password!'))
+                    return
+                }
+                DBOperations.findDB({ userid: userid, password: password }, {}, 1, 'users')
+                    .then(ressultSet => {
+                        if (resultSet.length) {
+                            req.session.userid = userid
+                            res.status(200).render('success_message_template',
+                                context = {
+                                    title: 'login successfully',
+                                    message: 'You have successfully logged in, click <a href="/account/home">here</a> to see your restaurants'
+                                })
+                        }
+                        else throw new Error('No such user exists!')
+                    })
+                    .catch(err => {
+                        wrongMessage(404, res, err)
+                    })
+            }
+        })
     }
 }
 module.exports = User
