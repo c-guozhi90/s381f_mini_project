@@ -31,7 +31,7 @@ const User = {
                             res.status(200).render('success_message_template.ejs',
                                 context = {
                                     title: 'Account creation successful',
-                                    message: 'You have automatically logged in, click <a href="/account/home/1">here</a> to your main page'
+                                    message: 'You have automatically logged in, click <a href="/account/home/1">here</a> to your homepage'
                                 })
                         }).catch(err => { throw err })
                     })
@@ -58,6 +58,13 @@ const User = {
             })
     },
     login: function (req, res) {
+        if (req.session.user_id) {
+            res.status(300).redirect('/account/home/1')
+            return
+        } else if (req.method == 'GET') {
+            res.status(200).render('login_form_template')
+            return
+        }
         form = new formidable.IncomingForm()
         form.parse(req, (err, fields, files) => {
             if (!err) {
@@ -70,7 +77,8 @@ const User = {
                 DBOperations.findDB({ userid: userid, password: password }, {}, 1, 'users')
                     .then(resultSet => {
                         if (resultSet.length) {
-                            req.session.userid = userid
+                            req.session['user_id'] = resultSet['userid']
+                            req.session['user_name'] = resultSet['name']
                             res.status(200).render('success_message_template',
                                 context = {
                                     title: 'login successfully',
@@ -87,7 +95,6 @@ const User = {
     },
     home: function (req, res) {
         if (!req.session.user_id) {
-            console.log('redirecting')
             res.status(300).redirect('/account/login')
             return
         }
@@ -96,7 +103,7 @@ const User = {
             DBOperations.findDB({ owner: req.session['user_name'] }, { restaurant_id: 1, name: 1 }, 1000) //maximum enquiry count will be 1000
                 .then(resultSet => {
                     req.session.ownRestaurants = resultSet
-                    res.status(200).render('homepage_template', contents(req.session.ownRestaurants, page))
+                    res.status(200).render('homepage_template', contents(req.session.ownRestaurants, req.session['user_name'], page))
                 })
                 .catch(err => {
                     wrongMessage(500, res, err)
@@ -106,7 +113,7 @@ const User = {
                 res.status(300).redirect('account/home/1')
                 return
             }
-            res.status(200).render('homepage_template', contents(req.session.ownRestaurants, page))
+            res.status(200).render('homepage_template', contents(req.session.ownRestaurants, req.session['user_name'], page))
         }
     }
 }
@@ -119,7 +126,7 @@ function wrongMessage(status, res, err) {
     else if (status === 404) global.redirectionError.title = '404 not found!'
     res.redirect('/error')
 }
-function contents(resultSet, page) {
+function contents(resultSet, user_name, page) {
     var context = []
     var pages = []
     if (resultSet.length) {
@@ -131,6 +138,6 @@ function contents(resultSet, page) {
         }
     }
     var title = 'user home'
-    var content = { context: context, pages: pages, title: title, curPage: page }
+    var content = { context: context, pages: pages, title: title, curPage: page, user_name: user_name }
     return content
 }

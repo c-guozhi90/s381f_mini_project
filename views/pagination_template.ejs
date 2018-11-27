@@ -1,6 +1,7 @@
 <%for(i=1;i<=pages.length;i++){%>
-    <%if(i==curPage)%>
+    <% if(i==curPage){ %>
         <b><%= i%></b>
-    <%else%>
+    <% }else{ %>
         <a href="<%= pages[i]['link']%>"><%= i%></a>
+    <% } %>
 <%}%>

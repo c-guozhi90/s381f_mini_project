@@ -22,7 +22,7 @@ app.get('/', HomepageHandle.homepage)
 
 app.route('/account/create').get(UserHandle.form).post(UserHandle.create)
 app.get('/account/check', UserHandle.check)
-app.get('/account/login', UserHandle.login)
+app.route('/account/login').all(UserHandle.login)
 app.get('/account/home/:page', UserHandle.home)
 
 app.get('/error', function (req, res) {
