@@ -93,6 +93,15 @@ const User = {
             }
         })
     },
+    logout: function (req, res) {
+        if (req.session.user_id && req.session.user_name) {
+            req.session.user_id = req.session.user_name = ''
+            res.status(200).redirect('/')
+            return
+        } else {
+            wrongMessage(404, res, new Error('do not do things like this!'))
+        }
+    },
     home: function (req, res) {
         if (!req.session.user_id) {
             res.status(300).redirect('/account/login')
