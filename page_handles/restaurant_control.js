@@ -1,23 +1,8 @@
-const formidable = require('formidable')
 const fs = require('fs')
 const DBOperation = require('../common_libs/db_operations')
+const FormHandle = require('../common_libs/form_operations')
 
 const CreateRestaurant = {
-    restaurant: {
-        restaurant_id: '',
-        name: '',
-        borough: '',
-        cuisine: '',
-        photo: '',
-        photo_mimetype: '',
-        address: {
-            street: '',
-            building: '',
-            zipcode: '',
-            coord: []
-        },
-        owner: ''
-    },
     form: function (req, res) {
         if (!req.session.user_name || !req.session.user_id) {
             res.status(300).redirect('/account/login')
@@ -31,17 +16,12 @@ const CreateRestaurant = {
             res.status(300).redirect('/account/login')
         }
 
-        var form = new formidable.IncomingForm()
-        form.parse(req, function (err, fields, files) {
-            if (err) {
-                wrongMessage(500, res, new Error('Form parse failed!'))
-                return
-            }
-            console.log(fields)
-            try {
-                assign(fields, files)
-                this.restaurant['owner'] = req.session['user_name']
-                DBOperation.insertDB(this.restaurant)
+        FormHandle.form(req)
+            .then(({ fields, files }) => {
+                return assign(req, fields, files)
+            }).then(restaurant => {
+                console.log(restaurant)
+                DBOperation.insertDB(restaurant)
                     .then(result => {
                         console.log(result.insertedCount + ' document inserted')
                         res.status(200).render('success_message_template',
@@ -50,12 +30,13 @@ const CreateRestaurant = {
                                 message: 'Create restaurant successfully! click <a href="/account/home">here</a> back to your homepage'
                             })
                     }).catch(err => {
+                        console.log(err)
                         wrongMessage(500, res, new Error('Insertion failed!'))
                     })
-            } catch (err) {
-                wrongMessage(500, res, err)
-            }
-        })
+            }).catch((err) => {
+                console.log(err)
+                wrongMessage(500, res, new Error('Parse form failed!'))
+            })
     }
 }
 module.exports = CreateRestaurant
@@ -75,31 +56,39 @@ function wrongMessage(status, res, err) {
             res.redirect('/error')
     }
 }
-function assign(fields, files) {
-    if (!fields['name']) throw new Error('Please input the restaurant name!')
-    for (i = 0; i < 4; i++) {
-        if (fields[i]) {
-            this.restaurant[i] = fields[i]
-        } else {
-            delete this.restaurant[i]
+function assign(req, fields, files) {
+    return new Promise((resolve, reject) => {
+        if (!fields['name']) {
+            throw new Error()
         }
-    }
-    fields['coordx'] !== '' && fields['coordy'] !== '' ? this.restaurant['address']['coord'] = [fields['coord_x'], fields['coord_y']] : delete this.restaurant['address']['coord']
-    fields.building != '' ? this.restaurant['street']['building'] = fields.building : delete this.restaurant['street']['building']
-    fields.zipcode != '' ? this.restaurant['street']['zipcode'] = fields.zipcode : delete this.restaurant['street']['zipcode']
-
-    if (files.fileupload.size > 0) {
-        this.restaurant['photo_mimetype'] = files.fileupload.type
-        var path = files.fileupload.path
-        fs.readFile(path, function (err, data) {
-            if (err) {
-                wrongMessage(500, res, new Error('File upload failed!'))
-                return
-            }
-            restaurant['photo'] = new Buffer(data).toString('base64')
-        })
-    } else {
-        delete this.restaurant['photo']
-        delete this.restaurant['photo_mimetype']
-    }
+        var restaurant = {
+            restaurant_id: fields['restaurant_id'],
+            name: fields['name'],
+            borough: fields['borough'],
+            cuisine: fields['cuisine'],
+            photo: '',
+            photo_mimetype: '',
+            address: {
+                street: fields['street'],
+                building: fields['building'],
+                zipcode: fields['zipcode'],
+                coord: fields['coord']
+            },
+            owner: req.session.user_name
+        }
+        if (files.photo.size > 0) {
+            var path = files.photo.path
+            var type = files.photo.type
+            FormHandle.photo(path, type)
+                .then(({ data, type }) => {
+                    restaurant['photo'] = new Buffer(data).toString('base64')
+                    restaurant['photo_mimetype'] = type
+                    resolve(restaurant)
+                }).catch(() => {
+                    throw new Error('Parse photo failed!')
+                })
+        } else {
+            resolve(restaurant)
+        }
+    })
 }

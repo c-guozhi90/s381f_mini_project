@@ -4,39 +4,39 @@
         <title>input restaurant information</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link href="css/style.css" rel="stylesheet">
+        <link href="/css/style.css" rel="stylesheet">
     </head>
     <body>
         <h1>Create a restaurant</h1>
-        <p>Hey, you are the owner</p>
-        <form class="form-list" method="post" action="/account/create" >
-            <ul>
-                <li><label>restaurant id</label><input name="restaurantid" type="text" value="" /></li>
+        <h3>Hey, you are the owner</h3>
+        <form method="post" action="/restaurant/create" enctype="multipart/form-data">
+            <ul class="form-list">
+                <li><label>restaurant id</label><input name="restaurant_id" type="text" value="" /></li>
                 <li><label>restaurant name</label><input name="name" type="text" value="" /></li>
                 <li><label>borough</label><input name="borough" type="text" value="" /></li>
                 <li><label>cuisine</label><input name="cuisine" type="text" value="" /></li>
-                <li><label>photo</label><input name="photo" type="text" value="" /></li>
-                <ul>
+                <li><label>photo</label><input name="photo" type="file"/></li>
+                <ul class="form-list">
                     <li><label>address</label>
-                    <ul>
+                    <ul class="form-list">
                         <li><label>street</label><input name="street" type="text" value="" /></li>
                         <li><label>building</label><input name="building" type="text" value="" /></li>
                         <li><label>zipcode</label><input name="zipcode" type="text" value="" /></li>
                         <li><label>coord</label>
-                            <ul>
+                            <ul class="form-list">
                                 <li><label>x: </label><input name="coordx" type="text" value=""/><label>y: </label><input name="coordy" type="text" value=""/></li>
                             </ul>
                         </li>
                     </ul>
                 </ul>
-                <li><input name="submit" type="submit" disabled="true" value="submit" /></li>
+                <li><input type="submit" disabled="true" value="submit" /></li>
             </ul>
         </form>
     </body>
 </html>
 <script>
     function checkNull(){
-        var button = document.getElementsByName('submit')[0]
+        var button = document.getElementsByTagName('input')[10]
         if(!this.value){ 
             button.disabled = true
             return

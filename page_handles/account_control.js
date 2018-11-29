@@ -21,6 +21,10 @@ const User = {
                 user['userid'] = fields.userid
                 user['name'] = fields.name
                 user['password'] = fields.password
+                if (!user['userid'] || !user['name'] || !user['password']) {
+                    wrongMessage(404, res, new Error('Do not pass empty information!'))
+                    return
+                }
                 DBOperations.findDB({ userid: user['userid'] }, {}, 1, 'users')
                     .then(resultSet => {
                         if (resultSet.length)
@@ -28,7 +32,7 @@ const User = {
                         DBOperations.insertDB(user, 'users').then(result => {
                             console.log(`User inserted ${result['insertedCount']} document(s)`)
                             req.session.user_id = user['userid']
-                            res.status(200).render('success_message_template.ejs',
+                            res.status(200).render('success_message_template',
                                 context = {
                                     title: 'Account creation successful',
                                     message: 'You have automatically logged in, click <a href="/account/home/1">here</a> to your homepage'
@@ -77,8 +81,9 @@ const User = {
                 DBOperations.findDB({ userid: userid, password: password }, {}, 1, 'users')
                     .then(resultSet => {
                         if (resultSet.length) {
-                            req.session['user_id'] = resultSet['userid']
-                            req.session['user_name'] = resultSet['name']
+                            console.log(resultSet)
+                            req.session['user_id'] = resultSet[0]['userid']
+                            req.session['user_name'] = resultSet[0]['name']
                             res.status(200).render('success_message_template',
                                 context = {
                                     title: 'login successfully',
@@ -88,7 +93,8 @@ const User = {
                         else throw new Error('No such user exists!')
                     })
                     .catch(err => {
-                        wrongMessage(404, res, err)
+                        console.log(err)
+                        wrongMessage(404, res, new Error('something went wrong!'))
                     })
             }
         })
@@ -104,6 +110,7 @@ const User = {
     },
     home: function (req, res) {
         if (!req.session.user_id) {
+            console.log(req.session['user_id'])
             res.status(300).redirect('/account/login')
             return
         }
@@ -139,12 +146,15 @@ function contents(resultSet, user_name, page) {
     var context = []
     var pages = []
     if (resultSet.length) {
+        console.log(resultSet)
         for (i = 0; i < 20 && 20 * (page - 1) + i < resultSet.length; i++) {
-            context[i].push({ restautant: `<a href="/restaurant/${resultSet['restaurant_id']}">${resultSet[20 * page + i]['name']}</a>` })
+            context.push({ restautant: `<a href="/restaurant/${resultSet[20 * (page - 1) + i]['restaurant_id']}">${resultSet[20 * (page - 1) + i]['name']}</a>` })
         }
-        for (i = 1; i <= Math.floor(resultSet / 20) + 1; i++) {
-            pages[i].push({ link: `/account/home/${i}` })
+        for (i = 1; i <= Math.floor(resultSet.length / 20) + 1; i++) {
+            pages.push({ link: `/account/home/${i}` })
         }
+    } else {
+        context.push({ restaurant: 'No restaurants shown. Click <a href="/restaurant/create">here</a> to create the first restaurant!' })
     }
     var title = 'user home'
     var content = { context: context, pages: pages, title: title, curPage: page, user_name: user_name }

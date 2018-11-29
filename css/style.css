@@ -36,14 +36,16 @@ input:submit {
 .form-list input[type="submit"]:disabled {
 	height: 30px;
 	width: 70px;
-	color: grey;
-	background-color: #97FFFF
+	color:#93D5FF;;;
+	border-color: #269CE9;
+	background: #269CE9;
 }
 .form-list input[type="submit"] {
 	height: 30px;
 	width: 70px;
 	color: white;
-	background-color: #0DFFFF;
+	background-color: #269CE9;
+	border-color: #269CE9;
 }
 .content {
 	width: auto;

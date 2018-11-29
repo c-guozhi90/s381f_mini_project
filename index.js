@@ -3,7 +3,7 @@ const app = Express()
 const session = require('cookie-session')
 const HomepageHandle = require('./page_handles/sample_homepage')
 const UserHandle = require('./page_handles/account_control')
-const restaurantHandle=require('./page_handles/restaurant_control')
+const restaurantHandle = require('./page_handles/restaurant_control')
 
 global.redirectionError = {
     status: 404,
@@ -24,17 +24,22 @@ app.get('/', HomepageHandle.homepage)
 app.route('/account/create').get(UserHandle.form).post(UserHandle.create)
 app.get('/account/check', UserHandle.check)
 app.route('/account/login').all(UserHandle.login)
-app.get('account/logout'.UserHandle.logout)
+app.get('/account/logout', UserHandle.logout)
 app.get('/account/home/:page', UserHandle.home)
 
-app.rounte('/restaurant/create').get(restaurantHandle.form).post(restaurantHandle.create)
+app.route('/restaurant/create').get(restaurantHandle.form).post(restaurantHandle.create)
 
 app.get('/error', function (req, res) {
     res.status(global.redirectionError.status)
     res.render('redirection_error_template')
 })
 
-app.get(/(^create)*/, function (req, res) {
-    res.redirect('/error')
+app.use(function (req, res, next) {
+    global.redirectionError = {
+        status: 404,
+        title: '404 not found!',
+        contents: 'The page you requested does not exist!'
+    }
+    res.render('redirection_error_template')
 })
 app.listen(process.env.PORT || 3000)
