@@ -1,24 +1,39 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>create account</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" media="screen" href="/css/style.css" />
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>create account</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" type="text/css" href="/css/style.css" />
 </head>
 
 <body>
-    <form id="user-form" action="/account/create" method="post">
-        <ul class="form-list">
-            <li><label>Id</label><input type="text" name="userid" /><span name="warning" class="warning"></span></li>
-            <li><label>User name</label><input type="text" name="name" /><span name="warning" class="warning"></span></li>
-            <li><label>password</label><input type="password" name="password" /><span name="warning" class="warning"></span></li>
-            <li><label>confrim password</label><input type="password" name="confirm" /><span name="warning" class="warning"></span></li>
-            <li><input type="submit" disabled="true" value="submit"></li>
-        </ul>
-    </form>
+<div class="content">
+  <form id="user-form" action="/account/create" method="post">
+    <ul class="form-list">
+      <li>
+        <label>User Id: </label>
+        <input type="text" name="userid" />
+        <span name="warning" class="warning"></span></li>
+      <li>
+        <label>User name: </label>
+        <input type="text" name="name" />
+        <span name="warning" class="warning"></span></li>
+      <li>
+        <label>password: </label>
+        <input name="password" type="password" />
+        <span name="warning" class="warning"></span></li>
+      <li>
+        <label>confrim password: </label>
+        <input type="password" name="confirm" />
+        <span name="warning" class="warning"></span></li>
+      <li>
+        <input type="submit" disabled="true" value="submit">
+      </li>
+    </ul>
+  </form>
+</div>
 </body>
 <script>
     var inputBoxes = document.getElementsByTagName('input')
@@ -106,5 +121,4 @@
     }
 
 </script>
-
 </html>

@@ -1,12 +1,51 @@
-nav ul li{
-    display: inline;
+nav ul li {
+	display: inline;
+	list-style-type: none;
 }
-input:submit{
-    width: 150px
+nav a{
+	text-decoration: none
 }
-.warning{
-    color: red
+input:submit {
+ width: 150px
 }
-.pass{
-    color: green
+.warning {
+	color: red
+}
+.pass {
+	color: green
+}
+.form-list {
+	list-style-type: none;
+	text-align: left;
+}
+.form-list li {
+	margin-top: 10px;
+}
+.form-list label {
+	width: 150px;
+	display: inline-block;
+	text-align: left;
+}
+.form-list input {
+	display: inline-block;
+}
+.form-list input:hover {
+	border: solid;
+	border-color: #9FF;
+}
+.form-list input[type="submit"]:disabled {
+	height: 30px;
+	width: 70px;
+	color: grey;
+	background-color: #97FFFF
+}
+.form-list input[type="submit"] {
+	height: 30px;
+	width: 70px;
+	color: white;
+	background-color: #0DFFFF;
+}
+.content {
+	width: auto;
+	min-width: 720px;
 }
