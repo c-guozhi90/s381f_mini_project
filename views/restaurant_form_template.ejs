@@ -1,3 +1,19 @@
+<% if(!context){
+    var context = {
+        restaurant_id: '',
+        name: '',
+        borough: '',
+        cuisine: '',
+        photo: '',
+        photo_mimetype: '',
+        address: {
+            street: '',
+            building: '',
+            zipcode: '',
+            coord: []
+        },
+    }
+}%>
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -11,20 +27,20 @@
         <h3>Hey, you are the owner</h3>
         <form method="post" action="/restaurant/create" enctype="multipart/form-data">
             <ul class="form-list">
-                <li><label>restaurant id</label><input name="restaurant_id" type="text" value="" /></li>
-                <li><label>restaurant name</label><input name="name" type="text" value="" /></li>
-                <li><label>borough</label><input name="borough" type="text" value="" /></li>
-                <li><label>cuisine</label><input name="cuisine" type="text" value="" /></li>
+                <li><label>restaurant id</label><input name="restaurant_id" type="text" value="<%= context.restaurant_id%>" /></li>
+                <li><label>restaurant name</label><input name="name" type="text" value="<%= context.name%>" /></li>
+                <li><label>borough</label><input name="borough" type="text" value="<%= context.borougn%>" /></li>
+                <li><label>cuisine</label><input name="cuisine" type="text" value="<%= context.cuisine%>" /></li>
                 <li><label>photo</label><input name="photo" type="file"/></li>
                 <ul class="form-list">
                     <li><label>address</label>
                     <ul class="form-list">
-                        <li><label>street</label><input name="street" type="text" value="" /></li>
-                        <li><label>building</label><input name="building" type="text" value="" /></li>
-                        <li><label>zipcode</label><input name="zipcode" type="text" value="" /></li>
+                        <li><label>street</label><input name="street" type="text" value="<%= context.address.street%>" /></li>
+                        <li><label>building</label><input name="building" type="text" value="<%= context.address.building%>" /></li>
+                        <li><label>zipcode</label><input name="zipcode" type="text" value="<%= context.address.zipcode%>" /></li>
                         <li><label>coord</label>
                             <ul class="form-list">
-                                <li><label>x: </label><input name="coordx" type="text" value=""/><label>y: </label><input name="coordy" type="text" value=""/></li>
+                                <li><label>x: </label><input name="coordx" type="text" value="<%= context.address.coord[0]%>"/><label>y: </label><input name="coordy" type="text" value="<%= context.address.coord[1]%>"/></li>
                             </ul>
                         </li>
                     </ul>

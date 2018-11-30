@@ -65,7 +65,7 @@ const CreateRestaurant = {
                 return assign(req, fields, files)
             })
             .then(restaurant => {
-                DBOperation.updateDB({ _id },restaurant)
+                DBOperation.updateDB({ _id }, restaurant)
             })
             .catch(err => {
                 wrongMessage(404, res, err)
@@ -105,7 +105,7 @@ function assign(req, fields, files) {
                 street: fields['street'],
                 building: fields['building'],
                 zipcode: fields['zipcode'],
-                coord: fields['coord']
+                coord: [fields['coordx'], fields['coordy']]
             },
             owner: req.session.user_name
         }
