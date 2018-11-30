@@ -69,6 +69,41 @@ const CreateRestaurant = {
             .catch(err => {
                 wrongMessage(404, res, err)
             })
+    },
+    delete: function (req, res) {
+        if (!req.session.user_id || !req.session.user_name) {
+            res.status(300).redirect('/account/login')
+            return
+        }
+        if (!req.param._id) {
+            wrongMessage(404, res, new Error('Empty id!'))
+            return
+        }
+
+        var owner = req.session.name
+        var _id = ObjectId(req.param._id)
+        DBOperation.findDB({ _id, owner })
+            .then(resultset => {
+                if (resultset.length) {
+                    return
+                } else {
+                    throw new Error('no such restaurant')
+                }
+            })
+            .then(() => {
+                DBOperation.deleteDB({ _id, owner })
+                    .then(result => {
+                        console.log(`user ${owner} deleted ${result.deletedCount} record(s)`)
+                        res.status(200).render('success_message_template',
+                            context = {
+                                title: 'Operation succeeded',
+                                message: 'you have deleted your restaurant. click <a href="/account/home/1">here</a> back to your homepage'
+                            })
+                    })
+            })
+            .catch(err => {
+                wrongMessage(404, res, err)
+            })
     }
 }
 module.exports = CreateRestaurant
