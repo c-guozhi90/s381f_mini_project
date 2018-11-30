@@ -50,7 +50,7 @@ const Restaurant = {
 
         var owner = req.session.user_name
         var _id = ObjectId(req.param._id)
-        DBOperation.findDB({ _id })
+        DBOperation.findDB({ _id, owner})
             .then(resultset => {
                 if (resultset.length && req.method == 'GET') {
                     res.status(200).render('restaurant_form_template', context = restaurant[0])
@@ -166,8 +166,6 @@ function assign(req, fields, files) {
             name: fields['name'],
             borough: fields['borough'],
             cuisine: fields['cuisine'],
-            photo: '',
-            photo_mimetype: '',
             address: {
                 street: fields['street'],
                 building: fields['building'],

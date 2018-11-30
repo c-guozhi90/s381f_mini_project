@@ -94,15 +94,16 @@ const DBOperations = {
     /**
      * Update records in mongodb
      * @param {object} conditions Compulsary, specify the conditions for data update
+     * @param {object} newValues Compulsary, set new values
      * @param {boolean} many Optional, update more than one record or not
      * @param {string} collection Optional, set the collection name
      */
-    updateDB: function (conditions, many, collection = defaultCollection) {
+    updateDB: function (conditions, newValues, many, collection = defaultCollection) {
         return new Promise((resolve, reject) => {
             this.connectDB()
                 .then(db => {
                     if (many) {
-                        db.collection(collection).updateMany(conditions, (err, results) => {
+                        db.collection(collection).updateMany(conditions, { $set: newValues }, (err, results) => {
                             if (!err) resolve(results)
                             else reject(err)
                         })
