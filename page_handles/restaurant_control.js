@@ -117,9 +117,13 @@ const Restaurant = {
                 var context = []
                 var object = {}
                 for (prop in resultset[0]) {
-                    if (prop == 'coord')
-                        continue
-                    if (prop != 'photo' && prop != 'photo_mimetype')
+                    if (prop == 'address') {
+                        for (prop in resultset[0]['address']) {
+                            if (prop == 'coord') continue
+                            object[prop] = resultset[0]['address'][prop]
+                        }
+                    }
+                    else if (prop != 'photo' && prop != 'photo_mimetype')
                         object[prop] = `<b>${prop}</b>: ${resultset[0][prop]}`
                     else if (prop == 'photo')
                         object[prop] = `data: ${resultset[0]['photo_mimetype']}; base64,${resultset[0]['photo']}`
@@ -131,7 +135,7 @@ const Restaurant = {
                         context,
                         pages: '',
                         curPage: '',
-                        coord: resultset[0]['coord']
+                        coord: resultset[0]['address']['coord']
                     })
             })
             .catch(err => {
