@@ -28,6 +28,7 @@ app.get('/account/logout', UserHandle.logout)
 app.get('/account/home/:page', UserHandle.home)
 
 app.route('/restaurant/create').get(restaurantHandle.form).post(restaurantHandle.create)
+app.route('/restaurant/update/:_id').all(restaurantHandle.update)
 
 app.get('/error', function (req, res) {
     res.status(global.redirectionError.status)

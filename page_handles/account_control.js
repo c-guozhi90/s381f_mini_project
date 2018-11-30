@@ -81,7 +81,6 @@ const User = {
                 DBOperations.findDB({ userid: userid, password: password }, {}, 1, 'users')
                     .then(resultSet => {
                         if (resultSet.length) {
-                            console.log(resultSet)
                             req.session['user_id'] = resultSet[0]['userid']
                             req.session['user_name'] = resultSet[0]['name']
                             res.status(200).render('success_message_template',

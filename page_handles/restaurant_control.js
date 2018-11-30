@@ -1,6 +1,7 @@
 const fs = require('fs')
 const DBOperation = require('../common_libs/db_operations')
 const FormHandle = require('../common_libs/form_operations')
+const ObjectId = require('mongdb').ObjectId
 
 const CreateRestaurant = {
     form: function (req, res) {
@@ -33,9 +34,41 @@ const CreateRestaurant = {
                         console.log(err)
                         wrongMessage(500, res, new Error('Insertion failed!'))
                     })
-            }).catch((err) => {
+            }).catch(err => {
                 console.log(err)
                 wrongMessage(500, res, new Error('Parse form failed!'))
+            })
+    },
+    update: function (req, res) {
+        if (!req.session.user_id || !req.session.user_name) {
+            res.status(300).redirect('/account/login')
+            return
+        }
+        if (!req.param._id) {
+            wrongMessage(404, res, new Error('Empty id!'))
+            return
+        }
+
+        var owner = req.session.user_name
+        var _id = ObjectId(req.param._id)
+        DBOperation.findDB({ _id })
+            .then(resultset => {
+                if (resultset.length && req.method == 'GET') {
+                    res.status(200).render('restaurant_form_template', context = restaurant[0])
+                } else if (resultset.length && req.method == 'POST') {
+                    return FormHandle.form(req)
+                } else {
+                    throw new Error('no such restaurant!')
+                }
+            })
+            .then(({ fields, files }) => {
+                return assign(req, fields, files)
+            })
+            .then(restaurant => {
+                DBOperation.updateDB({ _id },restaurant)
+            })
+            .catch(err => {
+                wrongMessage(404, res, err)
             })
     }
 }
