@@ -2,7 +2,7 @@ const DBOperation = require('../common_libs/db_operations')
 const FormHandle = require('../common_libs/form_operations')
 const ObjectId = require('mongodb').ObjectId
 
-const CreateRestaurant = {
+const Restaurant = {
     form: function (req, res) {
         if (!req.session.user_name || !req.session.user_id) {
             res.status(300).redirect('/account/login')
@@ -104,9 +104,42 @@ const CreateRestaurant = {
             .catch(err => {
                 wrongMessage(404, res, err)
             })
+    },
+    detail: function (req, res) {
+        if (!req.param._id) {
+            wrongMessage(404, res, new Error('Empty id!'))
+            return
+        }
+        var _id = ObjectId(req.param._id)
+        DBOperation.findDB({ _id })
+            .then(resultset => {
+                if (!resultset.length) throw new Error('no such restaurant!')
+                var context = []
+                var object = {}
+                for (prop in resultset[0]) {
+                    if (prop == 'coord')
+                        continue
+                    if (prop != 'photo' && prop != 'photo_mimetype')
+                        object[prop] = `<b>${prop}</b>: ${resultset[0][prop]}`
+                    else if (prop == 'photo')
+                        object[prop] = `data: ${resultset[0]['photo_mimetype']}; base64,${resultset[0]['photo']}`
+                }
+                context.push(object)
+                res.status(200).render('hompage_template',
+                    {
+                        user_name: req.session.user_name,
+                        context,
+                        pages: '',
+                        curPage: '',
+                        coord: resultset[0]['coord']
+                    })
+            })
+            .catch(err => {
+                wrongMessage(404, res, err)
+            })
     }
 }
-module.exports = CreateRestaurant
+module.exports = Restaurant
 function wrongMessage(status, res, err) {
     global.redirectionError.status = status
     global.redirectionError.contents = err.message

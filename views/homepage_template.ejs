@@ -8,10 +8,10 @@
     </head>
     <body>
     <nav>
-    <%- include('nav_template',{user_name:user_name}) -%>
+    <%- include('nav_template',{user_name}) -%>
     </nav>
     <h1><%= title%></h1>
-    <%- include('list_template',{context:context}) -%>
-    <%- include('pagination_template',{pages:pages,curPage:curPage}) -%>
+    <%- include('list_template',{context}) -%>
+    <%- include('pagination_template',{pages,curPage}) -%>
     </body>
 </html>

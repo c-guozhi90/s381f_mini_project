@@ -115,7 +115,7 @@ const User = {
         }
         var page = req.params.page
         if (page == 1) {
-            DBOperations.findDB({ owner: req.session['user_name'] }, { restaurant_id: 1, name: 1 }, 1000) //maximum enquiry count will be 1000
+            DBOperations.findDB({ owner: req.session['user_name'] }, { _id: 1, name: 1 }, 1000) //maximum enquiry count will be 1000
                 .then(resultSet => {
                     req.session.ownRestaurants = resultSet
                     res.status(200).render('homepage_template', contents(req.session.ownRestaurants, req.session['user_name'], page))
@@ -145,9 +145,10 @@ function contents(resultSet, user_name, page) {
     var context = []
     var pages = []
     if (resultSet.length) {
-        console.log(resultSet)
         for (i = 0; i < 20 && 20 * (page - 1) + i < resultSet.length; i++) {
-            context.push({ restautant: `<a href="/restaurant/${resultSet[20 * (page - 1) + i]['restaurant_id']}">${resultSet[20 * (page - 1) + i]['name']}</a>` })
+            var _id = resultSet[20 * (page - 1) + i]['_id']
+            var name = resultSet[20 * (page - 1) + i]['name']
+            context.push({ restautant: `<a href="/restaurant/${_id}">${name}</a>` })
         }
         for (i = 1; i <= Math.floor(resultSet.length / 20) + 1; i++) {
             pages.push({ link: `/account/home/${i}` })
