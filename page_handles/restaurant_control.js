@@ -9,7 +9,11 @@ const Restaurant = {
             return
         }
         res.status(200)
-        res.render('restaurant_form_template', { create: true })
+        res.render('restaurant_form_template',
+            {
+                create: true,
+                user_name: req.session.user_name
+            })
     },
     create: function (req, res) {
         if (!req.session.user_name || !req.session.user_id) {
@@ -18,16 +22,15 @@ const Restaurant = {
 
         FormHandle.form(req)
             .then(({ fields, files }) => {
-                return assign(req, fields, files, true)
+                return assign(req, fields, files, false)
             }).then(restaurant => {
-                console.log(restaurant)
                 DBOperation.insertDB(restaurant)
                     .then(result => {
                         console.log(result.insertedCount + ' document inserted')
-                        res.status(200).render('success_message_template',
-                            context = {
+                        res.render('success_message_template',
+                            {
                                 title: 'Operation succeed',
-                                message: 'Create restaurant successfully! click <a href="/account/home">here</a> back to your homepage'
+                                message: 'Create restaurant successfully! click <a href="/account/home/1">here</a> back to your homepage'
                             })
                     }).catch(err => {
                         console.log(err)
@@ -43,17 +46,23 @@ const Restaurant = {
             res.status(300).redirect('/account/login')
             return
         }
-        if (!req.param._id) {
+        if (!req.params._id) {
             wrongMessage(404, res, new Error('Empty id!'))
             return
         }
 
         var owner = req.session.user_name
-        var _id = ObjectId(req.param._id)
+        var _id = ObjectId(req.params._id)
         DBOperation.findDB({ _id, owner })
             .then(resultset => {
                 if (resultset.length && req.method == 'GET') {
-                    res.status(200).render('restaurant_form_template', { context: restaurant[0], update: true })
+                    res.status(200).render('restaurant_form_template',
+                        {
+                            user_name: req.session.user_name,
+                            context: resultset[0],
+                            create: false,
+                            update: true,
+                        })
                 } else if (resultset.length && req.method == 'POST') {
                     return FormHandle.form(req)
                 } else {
@@ -61,10 +70,18 @@ const Restaurant = {
                 }
             })
             .then(({ fields, files }) => {
-                return assign(req, fields, files, true)
+                return assign(req, fields, files, false)
             })
             .then(restaurant => {
                 DBOperation.updateDB({ _id }, { $set: restaurant })
+                    .then(result => {
+                        console.log(`user updated ${result.modifiedCount} record(s)`)
+                        res.status(200).render('success_message_template', context =
+                            {
+                                title: 'update succeeded',
+                                message: 'you have successfully updated your restaurant, click <a href=/account/home/1>here</a> back to your homepage'
+                            })
+                    })
             })
             .catch(err => {
                 wrongMessage(404, res, err)
@@ -75,13 +92,13 @@ const Restaurant = {
             res.status(300).redirect('/account/login')
             return
         }
-        if (!req.param._id) {
+        if (!req.params._id) {
             wrongMessage(404, res, new Error('Empty id!'))
             return
         }
 
-        var owner = req.session.name
-        var _id = ObjectId(req.param._id)
+        var owner = req.session.user_name
+        var _id = ObjectId(req.params._id)
         DBOperation.findDB({ _id, owner })
             .then(resultset => {
                 if (resultset.length) {
@@ -106,22 +123,27 @@ const Restaurant = {
             })
     },
     detail: function (req, res) {
-        if (!req.param._id) {
+        if (!req.params._id) {
             wrongMessage(404, res, new Error('Empty id!'))
             return
         }
-        var _id = ObjectId(req.param._id)
+        var _id = ObjectId(req.params._id)
         DBOperation.findDB({ _id })
             .then(resultset => {
                 if (!resultset.length) throw new Error('no such restaurant!')
                 var context = []
                 var object = {}
                 var isRated
+                var lat = '', lon = ''
                 for (prop in resultset[0]) {
                     if (prop == 'address') {
                         for (prop in resultset[0]['address']) {
-                            if (prop == 'coord') continue
-                            object['address'][prop] = `<b>${prop}</b>: ${resultset[0]['address'][prop]}`
+                            if (prop == 'coord') {
+                                lat = resultset[0]['address']['coord'][0]
+                                lon = resultset[0]['address']['coord'][1]
+                            } else {
+                                object['address'][prop] = `<b>${prop}</b>: ${resultset[0]['address'][prop]}`
+                            }
                         }
                     }
                     else if (prop == 'grades') {
@@ -141,17 +163,18 @@ const Restaurant = {
                         object[prop] = `data: ${resultset[0]['photo_mimetype']}; base64,${resultset[0]['photo']}`
                 }
                 context.push(object)
-                res.status(200).render('hompage_template',
+                res.status(200).render('homepage_template',
                     {
+                        title: `${resultset[0]['name']}`,
                         user_name: req.session.user_name,
                         context,
                         pages: '',
                         curPage: '',
                         mapData: {
-                            restaurant_name: `${context[0].name}`,
+                            restaurant_name: `${resultset[0]['name']}`,
                             zoom: 18,
-                            lat: resultset[0]['address']['coord'][0],
-                            lon: resultset[0]['address']['coord'][1]
+                            lat,
+                            lon
                         },
                         isRated
                     })
@@ -163,10 +186,12 @@ const Restaurant = {
     search: function (req, res) {
         FormHandle.form(req)
             .then(({ fields, files }) => {
-                return assign('', fields, files, false)
+                console.log(files)
+                return assign(req, fields, files, true)
             })
             .then(restaurant => {
-                return DBOperation.findDB(restaurant, { _id: 1, name: 1 }, null)
+                console.log(restaurant)
+                return DBOperation.findDB(restaurant, { _id: 1, name: 1 }, 1000)
                     .catch(err => {
                         throw new Error('something went wrong!')
                     })
@@ -177,6 +202,10 @@ const Restaurant = {
                         title: 'Search result',
                         user_name: req.session.user_name,
                         context: resultSet,
+                        mapData:{},
+                        pages: '',
+                        curPage: '',
+                        isRated:''
                     }
                 )
             })
@@ -185,7 +214,12 @@ const Restaurant = {
             })
     },
     searchForm: function (req, res) {
-        res.status.render('restaurant_form_template')
+        res.status(200).render('restaurant_form_template',
+            {
+                user_name: req.session.user_name,
+                create: false,
+                update: false
+            })
     },
     rate: function (req, res) {
         if (!req.session.user_name && !req.session.user_id) {
@@ -193,7 +227,7 @@ const Restaurant = {
             return
         }
         var score = req.query.score
-        var _id = ObjectId(req.param._id)
+        var _id = ObjectId(req.params._id)
         var user = req.session.user_name
         DBOperation.findDB({ _id })
             .then(() => {
@@ -218,7 +252,7 @@ function wrongMessage(status, res, err) {
             res.redirect('/error')
     }
 }
-function assign(req, fields, files, operation) {
+function assign(req, fields, files, search) {
     return new Promise((resolve, reject) => {
         if (!fields['name'] && operation) {
             throw new Error()
@@ -232,13 +266,12 @@ function assign(req, fields, files, operation) {
                 street: fields['street'],
                 building: fields['building'],
                 zipcode: fields['zipcode'],
-                coord: [fields['coordx'], fields['coordy']]
             },
             owner: req.session.user_name
         }
-        if (operation) {
-            restaurant['owner'] = req.session.user_name
-        } else {
+        if (fields['coordx'] && fields['coordy'])
+            restaurant['address']['coord'] = [+fields['coordx'], +fields['coordy']]
+        if (search) {
             restaurant['owner'] = fields['owner']
         }
 
@@ -248,8 +281,9 @@ function assign(req, fields, files, operation) {
         for (prop in restaurant['address']) {
             if (!restaurant['address'][prop]) delete restaurant['address'][prop]
         }
-        console.log(restaurant)
-        if (files.photo.size > 0) {
+        if (Object.keys(restaurant['address']).length == 0)
+            delete restaurant['address']
+        if (Object.keys(files).length && files.photo.size > 0) {
             var path = files.photo.path
             var type = files.photo.type
             FormHandle.photo(path, type)

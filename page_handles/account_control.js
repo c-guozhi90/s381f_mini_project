@@ -157,6 +157,14 @@ function contents(resultSet, user_name, page) {
         context.push({ restaurant: 'No restaurants shown. Click <a href="/restaurant/create">here</a> to create the first restaurant!' })
     }
     var title = 'user home'
-    var content = { context: context, pages: pages, title: title, curPage: page, user_name: user_name }
+    var content = {
+        context: context,
+        pages: pages,
+        title: title,
+        curPage: page,
+        user_name: user_name,
+        mapData: '',
+        isRated: true
+    }
     return content
 }

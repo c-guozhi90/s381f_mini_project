@@ -13,7 +13,11 @@ const Homepage = {
                     user_name,
                     title: 'Welcome',
                     context,
-
+                    mapData: '',
+                    pages: '',
+                    curPage: '',
+                    user_name: req.session.user_name,
+                    isRated:''
                 })
         }
     }
