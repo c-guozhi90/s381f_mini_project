@@ -4,8 +4,8 @@
         <%if(prop=='photo'){%>
         <li><img src='<%= context[idx][prop]%>'></li>
         <%}%>
-        <%else if(context[idx][prop]){%>
-        <li><%- context[idx][prop]%></li>
+        <%else if(context[idx][prop] && !(context[idx][prop] instanceof Object)){%>
+        <li><%- context[idx][prop] %></li>
         <%}%>
     <%}%>
     </ul>

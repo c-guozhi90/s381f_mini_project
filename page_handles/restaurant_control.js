@@ -53,7 +53,7 @@ const Restaurant = {
         DBOperation.findDB({ _id, owner })
             .then(resultset => {
                 if (resultset.length && req.method == 'GET') {
-                    res.status(200).render('restaurant_form_template', { context = restaurant[0], update: true })
+                    res.status(200).render('restaurant_form_template', { context: restaurant[0], update: true })
                 } else if (resultset.length && req.method == 'POST') {
                     return FormHandle.form(req)
                 } else {
@@ -64,7 +64,7 @@ const Restaurant = {
                 return assign(req, fields, files, true)
             })
             .then(restaurant => {
-                DBOperation.updateDB({ _id }, restaurant)
+                DBOperation.updateDB({ _id }, { $set: restaurant })
             })
             .catch(err => {
                 wrongMessage(404, res, err)
@@ -116,11 +116,23 @@ const Restaurant = {
                 if (!resultset.length) throw new Error('no such restaurant!')
                 var context = []
                 var object = {}
+                var isRated
                 for (prop in resultset[0]) {
                     if (prop == 'address') {
                         for (prop in resultset[0]['address']) {
                             if (prop == 'coord') continue
-                            object[prop] = resultset[0]['address'][prop]
+                            object['address'][prop] = `<b>${prop}</b>: ${resultset[0]['address'][prop]}`
+                        }
+                    }
+                    else if (prop == 'grades') {
+                        for (idx in resultset[0]['grades'][idx]) {
+                            object['grades'].push(
+                                {
+                                    content: `<b>user</b>: ${resultset[0]['grades'][idx]['user']} <b>rate</b>: ${resultset[0]['grades'][idx]['score']}`
+                                }
+                            )
+                            if (resultset[0]['grades'][idx]['user'] == req.session.user_name)
+                                isRated = true
                         }
                     }
                     else if (prop != 'photo' && prop != 'photo_mimetype')
@@ -140,7 +152,8 @@ const Restaurant = {
                             zoom: 18,
                             lat: resultset[0]['address']['coord'][0],
                             lon: resultset[0]['address']['coord'][1]
-                        }
+                        },
+                        isRated
                     })
             })
             .catch(err => {
@@ -173,6 +186,19 @@ const Restaurant = {
     },
     searchForm: function (req, res) {
         res.status.render('restaurant_form_template')
+    },
+    rate: function (req, res) {
+        if (!req.session.user_name && !req.session.user_id) {
+            res.status(300).redirect('/account/login')
+            return
+        }
+        var score = req.query.score
+        var _id = ObjectId(req.param._id)
+        var user = req.session.user_name
+        DBOperation.findDB({ _id })
+            .then(() => {
+                DBOperation.updateDB({ _id }, { $push: { grades: { user, score } } })
+            })
     }
 }
 module.exports = Restaurant

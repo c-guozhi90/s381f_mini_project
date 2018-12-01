@@ -7,14 +7,26 @@
         <link href="/css/style.css" rel="stylesheet">
     </head>
     <body>
-    <nav>
-    <%- include('nav_template',{user_name}) -%>
-    </nav>
-    <h1><%= title%></h1>
-    <%- include('list_template',{context}) -%>
-    <%- include('pagination_template',{pages,curPage}) -%>
-    <% if(mapData){ %>
-    <%- include('gmap_template',{mapData}) -%>
-    <% } %>
+        <header>
+            <nav>
+                <%- include('nav_template',{user_name}) -%>
+            </nav>
+        </header>
+        <div class="content">
+            <h1><%= title%></h1>
+            <%- include('list_template',{context}) -%>
+            <div>
+                <%- inlucde('list_template',{ context:context['address'] }) -%>
+            </div>
+            <% if(mapData){ %>
+                <%- include('gmap_template',{mapData}) -%>
+            <% } %>
+        
+            <%- include('pagination_template',{pages,curPage}) -%>
+
+            <%- include('operation_pane_template',{user_name,context,isRated}) -%>
+
+            <%- include('list_template',{ context:context['grades'] }) -%>
+        </div>
     </body>
 </html>

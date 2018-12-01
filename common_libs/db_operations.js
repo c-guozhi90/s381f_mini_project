@@ -103,7 +103,7 @@ const DBOperations = {
             this.connectDB()
                 .then(db => {
                     if (many) {
-                        db.collection(collection).updateMany(conditions, { $set: newValues }, (err, results) => {
+                        db.collection(collection).updateMany(conditions, newValues, (err, results) => {
                             if (!err) resolve(results)
                             else reject(err)
                         })
