@@ -23,15 +23,32 @@
         <link href="/css/style.css" rel="stylesheet">
     </head>
     <body>
+
+    <% if(create||update){ %>
         <h1>Create a restaurant</h1>
         <h3>Hey, you are the owner</h3>
+    <% } else{ %>
+        <h1>Search restaurant</h1>
+        <h3>fill keywords into the form</h3>
+    <% } %>
+
+    <% if(create||update){ %>
         <form method="post" action="/restaurant/create" enctype="multipart/form-data">
+    <% } else{ %>
+        <form method="get" action="/restaurant/search">
+    <% } %>
+
             <ul class="form-list">
                 <li><label>restaurant id</label><input name="restaurant_id" type="text" value="<%= context.restaurant_id%>" /></li>
                 <li><label>restaurant name</label><input name="name" type="text" value="<%= context.name%>" /></li>
                 <li><label>borough</label><input name="borough" type="text" value="<%= context.borougn%>" /></li>
                 <li><label>cuisine</label><input name="cuisine" type="text" value="<%= context.cuisine%>" /></li>
-                <li><label>photo</label><input name="photo" type="file"/></li>
+
+                <% if(create||update){ %>
+                    <li><label>photo</label><input name="photo" type="file"/></li>
+                <% } else{ %>
+                <li><label>owner</label><input name="owner" type="text"/></li>
+                <% } %>
                 <ul class="form-list">
                     <li><label>address</label>
                     <ul class="form-list">
@@ -45,11 +62,17 @@
                         </li>
                     </ul>
                 </ul>
-                <li><input type="submit" disabled="true" value="submit" /></li>
+
+                <% if(create||update){ %>
+                    <li><input type="submit" disabled="true" value="submit" /></li>
+                <%} else {%>
+                    <li><input type="submit" value="search" /></li>
+                <% }%>
             </ul>
         </form>
     </body>
 </html>
+<% if(create||update){ %>
 <script>
     function checkNull(){
         var button = document.getElementsByTagName('input')[10]
@@ -62,3 +85,4 @@
     var nameBox=document.getElementsByName('name')[0]
     nameBox.oninput=checkNull
 </script>
+<% } %>
