@@ -9,7 +9,7 @@ const Restaurant = {
             return
         }
         res.status(200)
-        res.render('restaurant_form_template')
+        res.render('restaurant_form_template', { create: true })
     },
     create: function (req, res) {
         if (!req.session.user_name || !req.session.user_id) {
@@ -18,7 +18,7 @@ const Restaurant = {
 
         FormHandle.form(req)
             .then(({ fields, files }) => {
-                return assign(req, fields, files)
+                return assign(req, fields, files, true)
             }).then(restaurant => {
                 console.log(restaurant)
                 DBOperation.insertDB(restaurant)
@@ -50,10 +50,10 @@ const Restaurant = {
 
         var owner = req.session.user_name
         var _id = ObjectId(req.param._id)
-        DBOperation.findDB({ _id, owner})
+        DBOperation.findDB({ _id, owner })
             .then(resultset => {
                 if (resultset.length && req.method == 'GET') {
-                    res.status(200).render('restaurant_form_template', context = restaurant[0])
+                    res.status(200).render('restaurant_form_template', { context = restaurant[0], update: true })
                 } else if (resultset.length && req.method == 'POST') {
                     return FormHandle.form(req)
                 } else {
@@ -61,7 +61,7 @@ const Restaurant = {
                 }
             })
             .then(({ fields, files }) => {
-                return assign(req, fields, files)
+                return assign(req, fields, files, true)
             })
             .then(restaurant => {
                 DBOperation.updateDB({ _id }, restaurant)
@@ -141,6 +141,33 @@ const Restaurant = {
             .catch(err => {
                 wrongMessage(404, res, err)
             })
+    },
+    search: function (req, res) {
+        FormHandle.form(req)
+            .then(({ fields, files }) => {
+                return assign('', fields, files, false)
+            })
+            .then(restaurant => {
+                return DBOperation.findDB(restaurant, { _id: 1, name: 1 }, null)
+                    .catch(err => {
+                        throw new Error('something went wrong!')
+                    })
+            })
+            .then(resultSet => {
+                res.status(200).render('homepage_template.ejs',
+                    {
+                        title: 'Search result',
+                        user_name: req.session.user_name,
+                        context: resultSet,
+                    }
+                )
+            })
+            .catch(err => {
+                wrongMessage(500, res, err)
+            })
+    },
+    searchForm: function (req, res) {
+        res.status.render('restaurant_form_template')
     }
 }
 module.exports = Restaurant
@@ -160,9 +187,9 @@ function wrongMessage(status, res, err) {
             res.redirect('/error')
     }
 }
-function assign(req, fields, files) {
+function assign(req, fields, files, operation) {
     return new Promise((resolve, reject) => {
-        if (!fields['name']) {
+        if (!fields['name'] && operation) {
             throw new Error()
         }
         var restaurant = {
@@ -178,6 +205,19 @@ function assign(req, fields, files) {
             },
             owner: req.session.user_name
         }
+        if (operation) {
+            restaurant['owner'] = req.session.user_name
+        } else {
+            restaurant['owner'] = fields['owner']
+        }
+
+        for (prop in restaurant) {
+            if (!restaurant[prop]) delete restaurant[prop]
+        }
+        for (prop in restaurant['address']) {
+            if (!restaurant['address'][prop]) delete restaurant['address'][prop]
+        }
+        console.log(restaurant)
         if (files.photo.size > 0) {
             var path = files.photo.path
             var type = files.photo.type
