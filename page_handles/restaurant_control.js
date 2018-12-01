@@ -50,7 +50,7 @@ const Restaurant = {
 
         var owner = req.session.user_name
         var _id = ObjectId(req.param._id)
-        DBOperation.findDB({ _id, owner})
+        DBOperation.findDB({ _id, owner })
             .then(resultset => {
                 if (resultset.length && req.method == 'GET') {
                     res.status(200).render('restaurant_form_template', context = restaurant[0])
@@ -135,7 +135,12 @@ const Restaurant = {
                         context,
                         pages: '',
                         curPage: '',
-                        coord: resultset[0]['address']['coord']
+                        mapData: {
+                            restaurant_name: `${context[0].name}`,
+                            zoom: 18,
+                            lat: resultset[0]['address']['coord'][0],
+                            lon: resultset[0]['address']['coord'][1]
+                        }
                     })
             })
             .catch(err => {

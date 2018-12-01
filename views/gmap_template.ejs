@@ -1,0 +1,20 @@
+<div id="map"> </div>
+<script>
+
+    function initMap() {
+        var myLatLng = { lat: <%= mapData.lat %>, lng: <%= mapData.lon%>};
+
+        var map = new google.maps.Map(document.getElementById('map'), {
+            zoom: <%= mapData.zoom%>,
+            center: myLatLng
+        });
+
+        var marker = new google.maps.Marker({
+            position: myLatLng,
+            map: map,
+            title: <%= mapData.restaurant_name%>
+        });
+    }
+</script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBJ3oAfy_LcVje2xrVLcqMDm8Vy5f3eDhk&callback=initMap">
+</script>
