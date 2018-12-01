@@ -8,7 +8,7 @@ delete restaurant|function_delete_restaurant|finished|Raven|30 Nov, 2018
 display restaurant details|function_display_restaurant|finished|Raven|30 Nov, 2018
 display restaurant in map|function_display_map|finished|Raven|1 Dec, 2018
 search restaurant|function_search_restaurant|finished|Raven|1 Dec, 2018
-rate restaurant|function_rate_restaurant|in progress|Raven|1 Dec, 2018
+rate restaurant|function_rate_restaurant|finished|Raven|1 Dec, 2018
 create account|function_create_account|finished|Raven|24 Nov, 2018
 refactor codes|master|finished|Raven|25 Nov, 2018
 login account|function_login_account|finished|Raven|26 Nov, 2018
