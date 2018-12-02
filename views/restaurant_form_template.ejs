@@ -4,14 +4,23 @@
         name: '',
         borough: '',
         cuisine: '',
-        photo: '',
-        photo_mimetype: '',
         address: {
             street: '',
             building: '',
             zipcode: '',
             coord: []
         },
+    }
+}else{
+    if(!context.hasOwnProperty('restaurant_id')) context['restaurant_id']=''
+    if(!context.hasOwnProperty('borough')) context['borough']=''
+    if(!context.hasOwnProperty('cuisine')) context['cuisine']=''
+    if(!context.hasOwnProperty('address')){ context['address']={street:'',building:'',zipcode:'',coord:['','']}
+    }else{
+        if(!context.address.hasOwnProperty('street')) context['address']['street']=''
+        if(!context.address.hasOwnProperty('building')) context['address']['building']=''
+        if(!context.address.hasOwnProperty('zipcode')) context['address']['zipcode']=''
+        if(!context.address.hasOwnProperty('coord')) context['address']['coord']=['','']
     }
 }%>
 <!DOCTYPE html>
@@ -28,18 +37,23 @@
         <%- include('nav_template',{user_name}) -%>            
         </nav>
     </header>
-    <% if(create||update){ %>
+    <% if(create){ %>
         <h1>Create a restaurant</h1>
         <h3>Hey, you are the owner</h3>
+    <% }else if(update){ %>
+        <h1>Update your restaurant</h1>  
+        <h3>You are the owner</h3>
     <% } else{ %>
         <h1>Search restaurant</h1>
         <h3>fill keywords into the form</h3>
     <% } %>
 
-    <% if(create||update){ %>
+    <% if(create){ %>
         <form method="post" action="/restaurant/create" enctype="multipart/form-data">
+    <%} else if(update){ %>
+        <form method="post" action="/restaurant/update/<%= context._id%>" enctype="multipart/form-data">
     <% } else{ %>
-        <form method="get" action="/restaurant/search">
+        <form method="post" action="/restaurant/search">
     <% } %>
 
             <ul class="form-list">

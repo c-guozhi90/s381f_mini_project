@@ -1,7 +1,7 @@
 const Express = require('express')
 const app = Express()
 const session = require('cookie-session')
-const HomepageHandle = require('./page_handles/sample_homepage')
+const HomepageHandle = require('./page_handles/homepage_control')
 const UserHandle = require('./page_handles/account_control')
 const restaurantHandle = require('./page_handles/restaurant_control')
 
@@ -29,10 +29,12 @@ app.get('/account/home/:page', UserHandle.home)
 
 app.route('/restaurant/create').get(restaurantHandle.form).post(restaurantHandle.create)
 app.route('/restaurant/update/:_id').all(restaurantHandle.update)
-app.get('/restautant/delete/:_id', restaurantHandle.delete)
+app.get('/restaurant/delete/:_id', restaurantHandle.delete)
 app.get('/restaurant/:_id', restaurantHandle.detail)
-app.get('/restaurant/search', restaurantHandle.search)
+app.post('/restaurant/search', restaurantHandle.search)
 app.get('/restaurant/search/form', restaurantHandle.searchForm)
+app.get('/restaurant/search/result/:page', restaurantHandle.search)
+app.get('/restaurant/rate/:_id',restaurantHandle.rate)
 
 app.get('/error', function (req, res) {
     res.status(global.redirectionError.status)

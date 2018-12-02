@@ -1,9 +1,13 @@
 <ul>
-    <li><a href="/">home</a></li>
-    <li><a href="/restaurant/search/form">search</a></li>
+    <li><a href="/">home | </a></li>
+    <li><a href="/restaurant/search/form">search | </a></li>
     <% if(!user_name){ %>
-        <li><a href="/account/login">login</a></li>
+        <li><a href="/account/login">login | </a></li>
+        <li><a href="/account/create">create account | </a></li>
     <% }else{ %>
-        <li>Hello <%= user_name%> <a href="/account/logout">log out</a></li>
+        <li>Hello <%= user_name%> | </li>
+        <li><a href="/account/home/1">your homepage | </a></li>
+        <li><a href="/restaurant/create">create restaurant | </a></li>
+        <li><a href="/account/logout">log out</a></li>
     <% }%>
 </ul>

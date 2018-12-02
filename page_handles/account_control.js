@@ -4,7 +4,7 @@ const DBOperations = require('../common_libs/db_operations')
 const User = {
     form: function (req, res) {
         if (req.session.user_id) {
-            res.redirect('/account/home')
+            res.redirect('/account/home/1')
             return
         }
         res.render('user_form_template')
@@ -32,6 +32,7 @@ const User = {
                         DBOperations.insertDB(user, 'users').then(result => {
                             console.log(`User inserted ${result['insertedCount']} document(s)`)
                             req.session.user_id = user['userid']
+                            req.session.user_name = user['name']
                             res.status(200).render('success_message_template',
                                 context = {
                                     title: 'Account creation successful',
@@ -157,6 +158,14 @@ function contents(resultSet, user_name, page) {
         context.push({ restaurant: 'No restaurants shown. Click <a href="/restaurant/create">here</a> to create the first restaurant!' })
     }
     var title = 'user home'
-    var content = { context: context, pages: pages, title: title, curPage: page, user_name: user_name }
+    var content = {
+        context: context,
+        pages: pages,
+        title: title,
+        curPage: page,
+        user_name: user_name,
+        mapData: '',
+        isRated: true
+    }
     return content
 }

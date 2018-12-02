@@ -1,0 +1,8 @@
+
+<ul class='form-list'>
+    <% for(idx in rate){%>
+        <% for(prop in rate[idx]){%>
+            <li><%- rate[idx][prop] %></li>
+        <%}%>
+    <%}%>
+</ul>

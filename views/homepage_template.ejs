@@ -5,6 +5,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link href="/css/style.css" rel="stylesheet">
+
     </head>
     <body>
         <header>
@@ -16,17 +17,22 @@
             <h1><%= title%></h1>
             <%- include('list_template',{context}) -%>
             <div>
-                <%- inlucde('list_template',{ context:context['address'] }) -%>
+                <%- include('address_template',{ address:context[0].address }) -%>
             </div>
-            <% if(mapData){ %>
+            <% if(Object.keys(mapData).length&&mapData.hasOwnProperty('lat')&&mapData.lat&&mapData.lon){ %>
                 <%- include('gmap_template',{mapData}) -%>
             <% } %>
         
             <%- include('pagination_template',{pages,curPage}) -%>
 
             <%- include('operation_pane_template',{user_name,context,isRated}) -%>
-
-            <%- include('list_template',{ context:context['grades'] }) -%>
+            <div>
+            <%try{%>
+            <%- include('rate_template',{rate:context[0].grades} ) -%>
+            <%}catch(err){%>
+                <p>no rate</p>
+            <%}%>
+            </div>
         </div>
     </body>
 </html>

@@ -1,15 +1,18 @@
-<%if(context.length==1 && user_name==context[0].owner){%>
-    <span>do you want to: </span><a href="/restaurant/update/<%= context[0]._id%>"><label>update</label></a><a href="/restaurant/delete/<%= context[0]._id%>"><label>delete</label></a></li>
-<%} else if(user_name && !isRated){%>
-    <form action="/restaurant/rate/<%= context[0]._id%>">
+<% var owner=`${context[0].owner}`%>
+<%if(context[0].hasOwnProperty('_id') && owner.substring(14) == user_name && user_name){ %>
+    <span>do you want to: </span>
+    <a href="/restaurant/update/<%= `${context[0]._id}`.substring(12)%>"><label>update</label></a>
+    <a href="/restaurant/delete/<%= `${context[0]._id}`.substring(12)%>"><label>delete</label></a></li>
+<%} else if(context[0].hasOwnProperty('_id')&&user_name && !isRated){%>
+    <form action="/restaurant/rate/<%= `${context[0]._id}`.substring(12)%>">
         <label>rate this restaurant: </label>
-        <select name="rate">
+        <select name="score">
         <% for(i=1;i<=10;i++){ %>
         <option value ="<%= i%>"><%= i%></option>
         <% } %>
         </select>
         <input type="submit" value="rate">
     </form>
-<%} else if(isRated){%>
+<%} else if(context[0].hasOwnProperty('_id')&&isRated){%>
 <p>you have rated</p>
 <%}%>

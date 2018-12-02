@@ -1,11 +1,11 @@
 <% for(idx in context){%>
     <ul class='form-list'>
     <% for(prop in context[idx]){%>
-        <%if(prop=='photo'){%>
-        <li><img src='<%= context[idx][prop]%>'></li>
-        <%}%>
-        <%else if(context[idx][prop] && !(context[idx][prop] instanceof Object)){%>
-        <li><%- context[idx][prop] %></li>
+        <%console.log(context)%>
+        <%if(prop=='photo'){ %>
+            <li><img src='<%= context[idx][prop]%>'></li>
+        <% }else if(context[idx][prop] && !(context[idx][prop] instanceof Object)){ %>
+            <li><%- context[idx][prop] %></li>
         <%}%>
     <%}%>
     </ul>

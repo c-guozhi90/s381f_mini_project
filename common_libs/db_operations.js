@@ -83,7 +83,7 @@ const DBOperations = {
                         })
                     } else {
                         db.collection(collection).deleteOne(conditions, function (err, results) {
-                            if (err) resolve(results)
+                            if (!err) resolve(results)
                             else reject(err)
                         })
                     }
@@ -108,8 +108,8 @@ const DBOperations = {
                             else reject(err)
                         })
                     } else {
-                        db.collection(collection).updateOne(conditions, (err, results) => {
-                            if (err) resolve(results)
+                        db.collection(collection).updateOne(conditions, newValues, (err, results) => {
+                            if (!err) resolve(results)
                             else reject(err)
                         })
                     }
