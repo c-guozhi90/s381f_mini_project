@@ -4,6 +4,7 @@ const session = require('cookie-session')
 const HomepageHandle = require('./page_handles/homepage_control')
 const UserHandle = require('./page_handles/account_control')
 const restaurantHandle = require('./page_handles/restaurant_control')
+const RESTfulHandle = require('./page_handles/restful_control')
 
 global.redirectionError = {
     status: 404,
@@ -34,7 +35,11 @@ app.get('/restaurant/:_id', restaurantHandle.detail)
 app.post('/restaurant/search', restaurantHandle.search)
 app.get('/restaurant/search/form', restaurantHandle.searchForm)
 app.get('/restaurant/search/result/:page', restaurantHandle.search)
-app.get('/restaurant/rate/:_id',restaurantHandle.rate)
+app.get('/restaurant/rate/:_id', restaurantHandle.rate)
+
+app.get('/api/restaurant/read/name/:arg',RESTfulHandle.getInfo)
+app.get('/api/restaurant/read/borough/:arg',RESTfulHandle.getInfo)
+app.get('/api/restaurant/read/cuisine/:arg',RESTfulHandle.getInfo)
 
 app.get('/error', function (req, res) {
     res.status(global.redirectionError.status)
