@@ -14,7 +14,7 @@ refactor codes|master|finished|Raven|25 Nov, 2018
 login account|function_login_account|finished|Raven|26 Nov, 2018
 user homepage|function_account_home|finished|Raven|29 Nov, 2018
 homepage|function_homepage|finished|Raven|30 Nov, 2018
-RESTful function|function_RESTful|initialized|Raven|1 Dec, 2018
+RESTful function|function_RESTful|in progress|Raven|1 Dec, 2018
 
 > ### Note
 > Fill functions' name or summary of works you have done into the task column  
