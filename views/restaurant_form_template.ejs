@@ -17,10 +17,10 @@
     if(!context.hasOwnProperty('cuisine')) context['cuisine']=''
     if(!context.hasOwnProperty('address')){ context['address']={street:'',building:'',zipcode:'',coord:['','']}
     }else{
-        if(!context.address.hasOwnProperty('street')) context['street']=''
-        if(!context.address.hasOwnProperty('building')) context['building']=''
-        if(!context.address.hasOwnProperty('zipcode')) context['zipcode']=''
-        if(!context.address.hasOwnProperty('coord')) context['coord']=['','']
+        if(!context.address.hasOwnProperty('street')) context['address']['street']=''
+        if(!context.address.hasOwnProperty('building')) context['address']['building']=''
+        if(!context.address.hasOwnProperty('zipcode')) context['address']['zipcode']=''
+        if(!context.address.hasOwnProperty('coord')) context['address']['coord']=['','']
     }
 }%>
 <!DOCTYPE html>

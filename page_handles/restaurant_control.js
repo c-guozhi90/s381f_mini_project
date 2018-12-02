@@ -27,7 +27,7 @@ const Restaurant = {
                 DBOperation.insertDB(restaurant)
                     .then(result => {
                         console.log(result.insertedCount + ' document inserted')
-                        res.render('success_message_template',
+                        res.render('success_message_template', context =
                             {
                                 title: 'Operation succeed',
                                 message: 'Create restaurant successfully! click <a href="/account/home/1">here</a> back to your homepage'
@@ -133,10 +133,12 @@ const Restaurant = {
                 if (!resultset.length) throw new Error('no such restaurant!')
                 var context = []
                 var object = {}
-                var isRated
+                var isRated = false
                 var lat = '', lon = ''
+                object['grades']=[]
                 for (prop in resultset[0]) {
                     if (prop == 'address') {
+                        object['address']={}
                         for (prop in resultset[0]['address']) {
                             if (prop == 'coord') {
                                 lat = resultset[0]['address']['coord'][0]
@@ -147,7 +149,7 @@ const Restaurant = {
                         }
                     }
                     else if (prop == 'grades') {
-                        for (idx in resultset[0]['grades'][idx]) {
+                        for (idx in resultset[0]['grades']) {
                             object['grades'].push(
                                 {
                                     content: `<b>user</b>: ${resultset[0]['grades'][idx]['user']} <b>rate</b>: ${resultset[0]['grades'][idx]['score']}`
@@ -184,30 +186,25 @@ const Restaurant = {
             })
     },
     search: function (req, res) {
+        // render results from session
+        if (req.method == 'GET' && req.session.hasOwnProperty(searchResults)) {
+            res.status(200).render('homepage_template.ejs', contents(req.session.searchResults, req.session.user_name, req.params.page))
+            return
+        }
         FormHandle.form(req)
             .then(({ fields, files }) => {
-                console.log(files)
                 return assign(req, fields, files, true)
             })
             .then(restaurant => {
                 console.log(restaurant)
-                return DBOperation.findDB(restaurant, { _id: 1, name: 1 }, 1000)
+                return DBOperation.findDB(restaurant, { _id: 1, name: 1 }, 100000)
                     .catch(err => {
                         throw new Error('something went wrong!')
                     })
             })
             .then(resultSet => {
-                res.status(200).render('homepage_template.ejs',
-                    {
-                        title: 'Search result',
-                        user_name: req.session.user_name,
-                        context: resultSet,
-                        mapData:{},
-                        pages: '',
-                        curPage: '',
-                        isRated:''
-                    }
-                )
+                req.session.searchResults = resultSet
+                res.status(200).render('homepage_template.ejs', contents(req.session.searchResults, req.session.user_name, 1))
             })
             .catch(err => {
                 wrongMessage(500, res, err)
@@ -231,7 +228,17 @@ const Restaurant = {
         var user = req.session.user_name
         DBOperation.findDB({ _id })
             .then(() => {
-                DBOperation.updateDB({ _id }, { $push: { grades: { user, score } } })
+                return DBOperation.updateDB({ _id }, { $push: { grades: { user, score } } })
+                    .then(results => {
+                        console.log(`user rate ${results.modifiedCount} record(s)`)
+                    })
+            })
+            .then(() => {
+                res.status(200).render('success_message_template', context =
+                    {
+                        title: 'rate succeeded',
+                        message: `You have rated a restaurant, click <a href="/restaurant/${req.params._id}">here</a> to the restaurant page`
+                    })
             })
     }
 }
@@ -254,7 +261,7 @@ function wrongMessage(status, res, err) {
 }
 function assign(req, fields, files, search) {
     return new Promise((resolve, reject) => {
-        if (!fields['name'] && operation) {
+        if (!fields['name'] && !search) {
             throw new Error()
         }
         var restaurant = {
@@ -298,4 +305,30 @@ function assign(req, fields, files, search) {
             resolve(restaurant)
         }
     })
+}
+function contents(resultSet, user_name, page) {
+    var context = []
+    var pages = []
+    if (resultSet.length) {
+        for (i = 0; i < 20 && 20 * (page - 1) + i < resultSet.length; i++) {
+            var _id = resultSet[20 * (page - 1) + i]['_id']
+            var name = resultSet[20 * (page - 1) + i]['name']
+            context.push({ restautant: `<a href="/restaurant/${_id}">${name}</a>` })
+        }
+        for (i = 1; i <= Math.floor(resultSet.length / 20) + 1; i++) {
+            pages.push({ link: `/restaurant/search/result/${i}` })
+        }
+    } else {
+        context.push({ restaurant: 'No restaurants shown.' })
+    }
+    var content = {
+        context,
+        pages: pages,
+        title: 'search results',
+        curPage: page,
+        user_name,
+        mapData: {},
+        isRated: true
+    }
+    return content
 }

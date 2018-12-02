@@ -33,6 +33,8 @@ app.get('/restaurant/delete/:_id', restaurantHandle.delete)
 app.get('/restaurant/:_id', restaurantHandle.detail)
 app.post('/restaurant/search', restaurantHandle.search)
 app.get('/restaurant/search/form', restaurantHandle.searchForm)
+app.get('/restaurant/search/result/:page', restaurantHandle.search)
+app.get('/restaurant/rate/:_id',restaurantHandle.rate)
 
 app.get('/error', function (req, res) {
     res.status(global.redirectionError.status)
