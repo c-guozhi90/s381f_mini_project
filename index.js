@@ -5,7 +5,8 @@ const HomepageHandle = require('./page_handles/homepage_control')
 const UserHandle = require('./page_handles/account_control')
 const restaurantHandle = require('./page_handles/restaurant_control')
 const RESTfulHandle = require('./page_handles/restful_control')
-
+const BodyParser = require('body-parser')
+const JsonParser= BodyParser.json()
 global.redirectionError = {
     status: 404,
     title: '404 not found!',
@@ -37,9 +38,10 @@ app.get('/restaurant/search/form', restaurantHandle.searchForm)
 app.get('/restaurant/search/result/:page', restaurantHandle.search)
 app.get('/restaurant/rate/:_id', restaurantHandle.rate)
 
-app.get('/api/restaurant/read/name/:arg',RESTfulHandle.getInfo)
-app.get('/api/restaurant/read/borough/:arg',RESTfulHandle.getInfo)
-app.get('/api/restaurant/read/cuisine/:arg',RESTfulHandle.getInfo)
+app.get('/api/restaurant/read/name/:arg', RESTfulHandle.getInfo)
+app.get('/api/restaurant/read/borough/:arg', RESTfulHandle.getInfo)
+app.get('/api/restaurant/read/cuisine/:arg', RESTfulHandle.getInfo)
+app.post('/api/restaurant/create',JsonParser, RESTfulHandle.postData)
 
 app.get('/error', function (req, res) {
     res.status(global.redirectionError.status)
