@@ -3,7 +3,7 @@
     <span>do you want to: </span>
     <a href="/restaurant/update/<%= `${context[0]._id}`.substring(12)%>"><label>update</label></a>
     <a href="/restaurant/delete/<%= `${context[0]._id}`.substring(12)%>"><label>delete</label></a></li>
-<%} else if(context[0].hasOwnProperty('_id')&&user_name && !isRated){%>
+<%} if(context[0].hasOwnProperty('_id')&&user_name && !isRated){%>
     <form action="/restaurant/rate/<%= `${context[0]._id}`.substring(12)%>">
         <label>rate this restaurant: </label>
         <select name="score">
