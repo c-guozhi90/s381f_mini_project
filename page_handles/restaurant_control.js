@@ -135,10 +135,10 @@ const Restaurant = {
                 var object = {}
                 var isRated = false
                 var lat = '', lon = ''
-                object['grades']=[]
+                object['grades'] = []
                 for (prop in resultset[0]) {
                     if (prop == 'address') {
-                        object['address']={}
+                        object['address'] = {}
                         for (prop in resultset[0]['address']) {
                             if (prop == 'coord') {
                                 lat = resultset[0]['address']['coord'][0]
@@ -196,11 +196,17 @@ const Restaurant = {
                 return assign(req, fields, files, true)
             })
             .then(restaurant => {
-                console.log(restaurant)
+                if (restaurant.hasOwnProperty('address') && Object.keys(restaurant['address'])){
+                    for (prop in restaurant['address']) {
+                        restaurant['address.'+prop]=restaurant['address'][prop]
+                    }
+                    delete restaurant['address']
+                }
+                console.log(restaurant)                
                 return DBOperation.findDB(restaurant, { _id: 1, name: 1 }, 100000)
-                    .catch(err => {
-                        throw new Error('something went wrong!')
-                    })
+                        .catch(err => {
+                            throw new Error('something went wrong!')
+                        })
             })
             .then(resultSet => {
                 req.session.searchResults = resultSet
